@@ -1,6 +1,12 @@
 @extends('layouts.app')
 
 @section('content')
+
+    <form action="/products" method="GET">
+        <input type="text" name="search" required/>
+        <button type="submit">Search</button>
+    </form>
+
     <div class="m-auto w-4/5 py-24">
         <div class="text-center">
             <h1 class="text-5xl uppercase bold">
@@ -24,9 +30,11 @@
             </a>
         </div>
             <div class="m-auto">
-                <h2 class="text-gray-700 text-5xl">
-                    {{$category->title}}
-                </h2>
+                <a href="categories/{{ $category->id}}">
+                    <h2 class="text-gray-700 text-5xl">
+                        {{$category->title}}
+                    </h2>
+                </a>
 
             <p class="text-lg text-gray-700 py-6">
                 {{$category->description}}

@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Category;
+use Illuminate\Database\Eloquent\Model;
+use App\Models\Subcategory;
 
-class CategoriesController extends Controller
+class SubcategoriesController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,10 +15,7 @@ class CategoriesController extends Controller
      */
     public function index()
     {
-        $categories = Category::all();
-        return view('categories.index', [
-            'categories' => $categories
-        ]);
+        //
     }
 
     /**
@@ -25,9 +23,9 @@ class CategoriesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create($id)
     {
-        return view('categories.create');
+        return view('subcategories.create')->with('id', $id);
     }
 
     /**
@@ -38,19 +36,17 @@ class CategoriesController extends Controller
      */
     public function store(Request $request)
     {
-        //$category = new Category;
-       // $category->title = $request->input('title');
-        //$category->description = $request->input('description');
-        //$category->save();
-
-        $category = Category::create([
+        $request->session()->put('id', 3);
+        dd($request->session()->get('id'));
+        //dd($request->input('category_id'));
+        $subcategory = Subcategory::create([
+            'category_id' => $request->input('category_id'),
             'title' => $request->input('title'),
             'description' => $request->input('description'),
         ]);
 
         return redirect('/categories');
     }
-
 
     /**
      * Display the specified resource.
@@ -60,10 +56,14 @@ class CategoriesController extends Controller
      */
     public function show($id)
     {
-        $category = Category::find($id);
+       
+
+        //dd($request->session()->get('key'));
+        $subcategory = Subcategory::find($id);
         
-        return view('categories.show')->with('category', $category);
+        return view('subcategories.show')->with('subcategory', $subcategory);
     }
+    
 
     /**
      * Show the form for editing the specified resource.
@@ -73,8 +73,9 @@ class CategoriesController extends Controller
      */
     public function edit($id)
     {
-        $category = Category::find($id);
-        return view('categories.edit')->with('category', $category);
+        dd($request->session()->get('id'));
+        $subcategory = Subcategory::find($id);
+        return view('subcategories.edit')->with('subcategory', $subcategory);
     }
 
     /**
@@ -86,7 +87,7 @@ class CategoriesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $category = Category::where('id', $id)
+        $subcategory = Subcategory::where('id', $id)
             ->update([
                 'title' => $request->input('title'),
                 'description' => $request->input('description'),
@@ -103,9 +104,9 @@ class CategoriesController extends Controller
      */
     public function destroy($id)
     {
-        $category = Category::find($id);
+        $subcategory = Subcategory::find($id);
 
-        $category->delete();
+        $subcategory->delete();
 
         return redirect('/categories');
     }

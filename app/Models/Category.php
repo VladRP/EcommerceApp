@@ -16,4 +16,9 @@ class Category extends Model
     public $timestamps = true;
 
     protected $fillable = ['title', 'description'];
+
+    public function subCategory()
+    {
+        return $this->hasMany(Subcategory::class);
+    }
 }

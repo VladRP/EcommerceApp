@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Category;
-
-class CategoriesController extends Controller
+use App\Models\Product;
+use Illuminate\Support\Facades\Session;
+class ProductsController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,10 +14,7 @@ class CategoriesController extends Controller
      */
     public function index()
     {
-        $categories = Category::all();
-        return view('categories.index', [
-            'categories' => $categories
-        ]);
+        //
     }
 
     /**
@@ -25,9 +22,9 @@ class CategoriesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create($id)
     {
-        return view('categories.create');
+        return view('products.create')->with('id', $id);
     }
 
     /**
@@ -37,20 +34,20 @@ class CategoriesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        //$category = new Category;
-       // $category->title = $request->input('title');
-        //$category->description = $request->input('description');
-        //$category->save();
+    {   
+        Session::put('id', 4);
 
-        $category = Category::create([
+        $product = Product::create([
+            'subcategory_id' => $request->input('subcategory_id'),
             'title' => $request->input('title'),
             'description' => $request->input('description'),
+            'price' => $request->input('price'),
+            'in_stock' => $request->input('in_stock'),
+            'brand' => $request->input('brand'),
         ]);
 
         return redirect('/categories');
     }
-
 
     /**
      * Display the specified resource.
@@ -60,9 +57,7 @@ class CategoriesController extends Controller
      */
     public function show($id)
     {
-        $category = Category::find($id);
         
-        return view('categories.show')->with('category', $category);
     }
 
     /**
@@ -73,8 +68,7 @@ class CategoriesController extends Controller
      */
     public function edit($id)
     {
-        $category = Category::find($id);
-        return view('categories.edit')->with('category', $category);
+        //
     }
 
     /**
@@ -86,13 +80,7 @@ class CategoriesController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $category = Category::where('id', $id)
-            ->update([
-                'title' => $request->input('title'),
-                'description' => $request->input('description'),
-        ]);
-
-        return redirect('categories');
+        //
     }
 
     /**
@@ -103,10 +91,41 @@ class CategoriesController extends Controller
      */
     public function destroy($id)
     {
-        $category = Category::find($id);
-
-        $category->delete();
-
-        return redirect('/categories');
+        //
     }
+
+    public function search(Request $request)
+    {
+        
+        
+        $search = $request->input('search');
+        $results = Product::where('title', 'LIKE', "%{$search}%")->orWhere('description', 'like', "%{$search}%")->get();
+        //dd($results);
+        //dd(Session::get('products'));
+        //dd(Session::get('id'));
+       
+        return view('products.search')->with('results', $results);
+    }
+
+    public function addToCart(Request $request, $id){
+
+        $products = Session::get('products');
+       
+        if($products!=null){
+            $product = Product::find($id)->toArray();
+            
+            Session::push('products', $product);}  
+        else{
+            $product = Product::find($id)->toArray();
+            Session::push('products', $product);
+        }
+        
+        //return redirect('home');
+    }
+
+    //public function deleteFromCart($id){
+       // $product = Product::find($id);
+        //Session::get('products');
+
+    //}
 }
