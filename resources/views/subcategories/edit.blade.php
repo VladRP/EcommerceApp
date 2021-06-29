@@ -8,29 +8,56 @@
             </h1>
         </div>
     </div>
-
     <div class="flex justify-center pt-20">
-        
         <form action="/subcategories/{{ $subcategory->id }}" method="POST">
             @csrf
             @method('PUT')
-            <div class="block">
-                <input
-                    type="text"
-                    class="block shadow-txl mb-10 p-2 w-80 italic placeholder-gray-400"
-                    name="title"
-                    value="{{ $subcategory->title }}">
-
-                <input
-                    type="text"
-                    class="block shadow-txl mb-10 p-2 w-80 italic placeholder-gray-400"
-                    name="description"
-                    value="{{ $subcategory->description }}">
-
-                <button type="submit" class="bg-green-500 block shadow-5xl mb-10 p-2 w-80 uppercase font-bold">
-                    Submit
-                </button>
-            </div>
+        <div class="form-group">
+            <input
+                type="text"
+                class="form-control"
+                name="title"
+                value="{{ $subcategory->title }}">
+            @if($errors->has('title'))
+                <span class="text-danger">{{ $errors->first('title') }}</span>
+            @endif
+        </div>
+        <div class="form-group">
+            <input
+                type="text"
+                class="form-control"
+                name="description"
+                value="{{ $subcategory->description }}">
+            @if($errors->has('description'))
+                <span class="text-danger">{{ $errors->first('description') }}</span>
+            @endif
+        </div>
+        <div class="form-group">
+            <input
+                type="text"
+                class="form-control"
+                name="description"
+                value="{{ $subcategory->description }}">
+            @if($errors->has('description'))
+                <span class="text-danger">{{ $errors->first('description') }}</span>
+            @endif
+        </div>
+        <div class="form-group">
+            <input
+                type="text"
+                class="form-control"
+                name="image"
+                value="{{ $subcategory->image }}">
+            @if($errors->has('image'))
+                <span class="text-danger">{{ $errors->first('image') }}</span>
+            @endif
+        </div>
+            <button type="submit" class="btn btn-primary">
+                Update
+            </button>
+        <div>
+                <a href="/categories/{{$subcategory->category->id}}">Go back to main category </a>
+        </div>
         </form>
     </div>
 @endsection     

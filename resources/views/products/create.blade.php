@@ -8,54 +8,77 @@
             </h1>
         </div>
     </div>
-
     <div class="flex justify-center pt-20">
-        
         <form action="/products" method="POST">
             @csrf
-            <div class="block">
-                <input
-                    type="hidden"
-                    value={{$id}}
-                    name="subcategory_id">
-
-                <input
-                    type="text"
-                    class="block shadow-txl mb-10 p-2 w-80 italic placeholder-gray-400"
-                    name="title"
-                    placeholder="Subcategory title...">
-
-                <input
-                    type="text"
-                    class="block shadow-txl mb-10 p-2 w-80 italic placeholder-gray-400"
-                    name="description"
-                    placeholder="Subcategory description...">
-
-                
-                <input
-                    type="number"
-                    class="block shadow-txl mb-10 p-2 w-80 italic placeholder-gray-400"
-                    name="price"
-                    placeholder="Product price...">
-
-                
-                <input
-                    type="number"
-                    class="block shadow-txl mb-10 p-2 w-80 italic placeholder-gray-400"
-                    name="in_stock"
-                    placeholder="Is in stock?...">
-
-                
-                <input
-                    type="text"
-                    class="block shadow-txl mb-10 p-2 w-80 italic placeholder-gray-400"
-                    name="brand"
-                    placeholder="Brand name...">
-
-                <button type="submit" class="bg-green-500 block shadow-5xl mb-10 p-2 w-80 uppercase font-bold">
-                    Submit
-                </button>
-            </div>
+        <div class="form-group">
+            <input
+                type="hidden"
+                class="form-control"
+                value={{$id}}
+                name="subcategory_id">
+        </div>
+        <div class="form-group">
+            <input
+                type="text"
+                class="form-control"
+                name="title"
+                placeholder="Product title...">
+            @if($errors->has('title'))
+                <span class="text-danger">{{ $errors->first('title') }}</span>
+            @endif
+        </div>
+        <div class="form-group">
+            <textarea class="form-control" name="description"  placeholder="Product description..."></textarea>
+            @if($errors->has('description'))
+                <span class="text-danger">{{ $errors->first('description') }}</span>
+            @endif
+        </div>
+        <div class="form-group">
+            <input
+                type="number"
+                class="form-control"
+                name="price"
+                placeholder="Product price...">
+            @if($errors->has('price'))
+                <span class="text-danger">{{ $errors->first('price') }}</span>
+            @endif
+        </div>
+        <div class="form-group">  
+            <input
+                type="text"
+                class="form-control"
+                name="brand"
+                placeholder="Brand name...">
+            @if($errors->has('brand'))
+                <span class="text-danger">{{ $errors->first('brand') }}</span>
+            @endif
+        </div>
+        <div class="form-group">   
+            <input
+                type="number"
+                class="form-control"
+                name="stock"
+                placeholder="Stock...">
+            @if($errors->has('stock'))
+                <span class="text-danger">{{ $errors->first('stock') }}</span>
+            @endif
+        </div>
+            <div class="form-group">   
+            <input
+                type="text"
+                class="form-control"
+                name="image"
+                placeholder="Image URL...">
+            @if($errors->has('image'))
+                <span class="text-danger">{{ $errors->first('image') }}</span>
+            @endif
+        </div>
+            <button type="submit" class="btn btn-primary">
+                Create
+            </button>
+        </div>
         </form>
+        <a href="/categories"> Go back to categories</a>
     </div>
 @endsection    

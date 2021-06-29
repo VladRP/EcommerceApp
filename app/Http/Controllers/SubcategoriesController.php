@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\Subcategory;
+use Illuminate\Support\Facades\Gate;
 
 class SubcategoriesController extends Controller
 {
@@ -25,7 +26,11 @@ class SubcategoriesController extends Controller
      */
     public function create($id)
     {
-        return view('subcategories.create')->with('id', $id);
+        if(Gate::allows('admin-only', auth()->user())){
+
+            return view('subcategories.create')->with('id', $id);
+        }
+        return abort(403);
     }
 
     /**
@@ -35,14 +40,18 @@ class SubcategoriesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        $request->session()->put('id', 3);
-        dd($request->session()->get('id'));
+    {   
+        $request->validate([
+            'title' => 'required|max:255',
+            'description' => 'required|max:255',
+            'image' => 'required|max:255',
+        ]);
         //dd($request->input('category_id'));
         $subcategory = Subcategory::create([
             'category_id' => $request->input('category_id'),
             'title' => $request->input('title'),
             'description' => $request->input('description'),
+            'image' => $request->input('image'),
         ]);
 
         return redirect('/categories');
@@ -56,9 +65,6 @@ class SubcategoriesController extends Controller
      */
     public function show($id)
     {
-       
-
-        //dd($request->session()->get('key'));
         $subcategory = Subcategory::find($id);
         
         return view('subcategories.show')->with('subcategory', $subcategory);
@@ -73,9 +79,13 @@ class SubcategoriesController extends Controller
      */
     public function edit($id)
     {
-        dd($request->session()->get('id'));
         $subcategory = Subcategory::find($id);
-        return view('subcategories.edit')->with('subcategory', $subcategory);
+        if(Gate::allows('admin-only', auth()->user())){
+
+            return view('subcategories.edit')->with('subcategory', $subcategory);
+        }
+
+        return abort(403);
     }
 
     /**
@@ -87,10 +97,16 @@ class SubcategoriesController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'title' => 'required|max:255',
+            'description' => 'required|max:255',
+            'image' => 'required|max:255',
+        ]);
         $subcategory = Subcategory::where('id', $id)
             ->update([
                 'title' => $request->input('title'),
                 'description' => $request->input('description'),
+                'image' => 'required|max:255'
         ]);
 
         return redirect('categories');
@@ -104,10 +120,13 @@ class SubcategoriesController extends Controller
      */
     public function destroy($id)
     {
-        $subcategory = Subcategory::find($id);
+        if(Gate::allows('admin-only', auth()->user())){
+            $subcategory = Subcategory::find($id);
+            $subcategory->delete();
 
-        $subcategory->delete();
+            return redirect('/categories');
+        }
 
-        return redirect('/categories');
+            return abort(403);
     }
 }

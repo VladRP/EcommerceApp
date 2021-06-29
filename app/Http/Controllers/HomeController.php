@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Auth;
+
 class HomeController extends Controller
 {
     /**
@@ -26,13 +28,31 @@ class HomeController extends Controller
         return view('home');
     }
 
-    public function private()
+    public function showUserPage()
     {
-        if(Gate::allows('admin-only', auth()->user())) {
-            return view('private');
-        }
-        return abort(403);
+        return view('homeuser');
+    }
+
+    public function updateAddress(Request $request)
+    {
+        $request->validate([
+            'country' => 'required|max:255|min:3',
+            'city' => 'required|max:255|min:3',
+            'address' => 'required|max:255'
+        ]);
+        $user = Auth::user();
+        $user->country = $request->input('country');
+        $user->city = $request->input('city');
+        $user->address = $request->input('address');
+        $user->save();
+
+        return redirect()->back();
+    }
+
+    public function aboutUs()
+    {
         
+        return view('private');
     }
 }
  

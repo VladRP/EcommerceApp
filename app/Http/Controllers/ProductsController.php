@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Cartitem;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Gate;
+use Auth;
+
 class ProductsController extends Controller
 {
     /**
@@ -14,7 +18,11 @@ class ProductsController extends Controller
      */
     public function index()
     {
-        //
+        $products = Product::all();
+
+        return view('products.index', [
+            'products' => $products
+        ]);
     }
 
     /**
@@ -24,7 +32,12 @@ class ProductsController extends Controller
      */
     public function create($id)
     {
-        return view('products.create')->with('id', $id);
+        if(Gate::allows('admin-only', auth()->user())){
+
+            return view('products.create')->with('id', $id);
+        }
+
+        return abort(403);
     }
 
     /**
@@ -34,16 +47,23 @@ class ProductsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {   
-        Session::put('id', 4);
-
+    {       
+        $request->validate([
+        'title' => 'required|max:255',
+        'description' => 'required|max:255',
+        'price' => 'required',
+        'brand' => 'required|max:255',
+        'stock' => 'required',
+        'image' => 'required',
+        ]);
         $product = Product::create([
             'subcategory_id' => $request->input('subcategory_id'),
             'title' => $request->input('title'),
             'description' => $request->input('description'),
             'price' => $request->input('price'),
-            'in_stock' => $request->input('in_stock'),
             'brand' => $request->input('brand'),
+            'stock' => $request->input('stock'),
+            'image' => $request->input('image'),
         ]);
 
         return redirect('/categories');
@@ -57,7 +77,9 @@ class ProductsController extends Controller
      */
     public function show($id)
     {
-        
+        $product = Product::where('id', $id)->first();
+
+        return view('products.show')->with('product', $product);
     }
 
     /**
@@ -68,7 +90,13 @@ class ProductsController extends Controller
      */
     public function edit($id)
     {
-        //
+        $product = Product::find($id);
+        if(Gate::allows('admin-only', auth()->user())){
+
+            return view('products.edit')->with('product', $product);
+        }
+
+        return abort(403);
     }
 
     /**
@@ -80,7 +108,24 @@ class ProductsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'title' => 'required|max:255',
+            'description' => 'required|max:255',
+            'price' => 'required',
+            'brand' => 'required|max:255',
+            'stock' => 'required',
+            'image' => 'required'
+        ]);
+        $product = Product::where('id', $id)->update([
+                'title' => $request->input('title'),
+                'description' => $request->input('description'),
+                'price' => $request->input('price'),
+                'brand' => $request->input('brand'),
+                'stock' => $request->input('stock'),
+                'image' => $request->input('image'),
+        ]);
+
+        return redirect('categories');
     }
 
     /**
@@ -91,41 +136,33 @@ class ProductsController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $product = Product::find($id);
+        $product->delete();
+
+        return redirect('/');
     }
 
     public function search(Request $request)
     {
-        
-        
         $search = $request->input('search');
-        $results = Product::where('title', 'LIKE', "%{$search}%")->orWhere('description', 'like', "%{$search}%")->get();
-        //dd($results);
-        //dd(Session::get('products'));
-        //dd(Session::get('id'));
-       
+        $results = Product::where('title', 'LIKE', "%{$search}%")
+        ->orWhere('description', 'like', "%{$search}%")
+        ->orWhere('brand', 'like', "%{$search}%")
+        ->get();
+   
         return view('products.search')->with('results', $results);
     }
 
-    public function addToCart(Request $request, $id){
+    public function addStock(Request $request, $id)
+    {
+        if(Gate::allows('admin-only', auth()->user())){
+            $product = Product::find($id);
+            $product->stock = $request->input('added_stock');
+            $product->save();
 
-        $products = Session::get('products');
-       
-        if($products!=null){
-            $product = Product::find($id)->toArray();
-            
-            Session::push('products', $product);}  
-        else{
-            $product = Product::find($id)->toArray();
-            Session::push('products', $product);
+            return redirect()->back();
         }
         
-        //return redirect('home');
-    }
-
-    //public function deleteFromCart($id){
-       // $product = Product::find($id);
-        //Session::get('products');
-
-    //}
+        return abort(403);
+    }   
 }

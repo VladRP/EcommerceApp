@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
+use Illuminate\Support\Facades\Gate;
 
 class CategoriesController extends Controller
 {
@@ -15,6 +16,7 @@ class CategoriesController extends Controller
     public function index()
     {
         $categories = Category::all();
+
         return view('categories.index', [
             'categories' => $categories
         ]);
@@ -27,7 +29,12 @@ class CategoriesController extends Controller
      */
     public function create()
     {
+        if(Gate::allows('admin-only', auth()->user())){
+
         return view('categories.create');
+        }
+
+        return abort(403);
     }
 
     /**
@@ -38,14 +45,16 @@ class CategoriesController extends Controller
      */
     public function store(Request $request)
     {
-        //$category = new Category;
-       // $category->title = $request->input('title');
-        //$category->description = $request->input('description');
-        //$category->save();
+        $request->validate([
+            'title' => 'required|max:255',
+            'description' => 'required|max:255',
+            'image' =>'required|max:255'
+        ]);
 
         $category = Category::create([
             'title' => $request->input('title'),
             'description' => $request->input('description'),
+            'image' => $request->input('image'),
         ]);
 
         return redirect('/categories');
@@ -61,7 +70,7 @@ class CategoriesController extends Controller
     public function show($id)
     {
         $category = Category::find($id);
-        
+
         return view('categories.show')->with('category', $category);
     }
 
@@ -74,7 +83,12 @@ class CategoriesController extends Controller
     public function edit($id)
     {
         $category = Category::find($id);
+        if(Gate::allows('admin-only', auth()->user())){
+
         return view('categories.edit')->with('category', $category);
+        }
+
+        return abort(403);
     }
 
     /**
@@ -86,10 +100,16 @@ class CategoriesController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'title' => 'required|max:255',
+            'description' => 'required|max:255',
+            'image' => 'required|max:255'
+        ]);
         $category = Category::where('id', $id)
             ->update([
                 'title' => $request->input('title'),
                 'description' => $request->input('description'),
+                'image' => $request->input('image'),
         ]);
 
         return redirect('categories');
@@ -104,7 +124,6 @@ class CategoriesController extends Controller
     public function destroy($id)
     {
         $category = Category::find($id);
-
         $category->delete();
 
         return redirect('/categories');

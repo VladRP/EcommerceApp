@@ -1,1 +1,0 @@
-<p>This page can be accesed by the admin user</p>
